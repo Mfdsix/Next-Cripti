@@ -1,65 +1,101 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+  import {
+  Navbar, Nav, Container, Jumbotron, Button, Row, Col
+  } from 'react-bootstrap'
+  import 'bootstrap/dist/css/bootstrap.min.css'
+  import axios from 'axios'
 
-export default function Home() {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+  function Index({ cryptos }){
+  return(
+  <div>
+    <Navbar bg="dark" variant="dark">
+      <Container>
+        <Navbar.Brand href="#home">Cripti</Navbar.Brand>
+        <Nav className="mr-auto">
+          <Nav.Link href="#home">Home</Nav.Link>
+          <Nav.Link href="#features">Features</Nav.Link>
+          <Nav.Link href="#pricing">Pricing</Nav.Link>
+        </Nav>
+      </Container>
+    </Navbar>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
+    <Jumbotron>
+      <Container>
+        <h1>Hello, devs!</h1>
+        <p>Let's see how much cripto prices with <b>cripti</b></p>
+        <p>
+          <Button variant="primary">Learn more</Button>
         </p>
+      </Container>
+    </Jumbotron>
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+    <Container className={ 'mb-4' }>
+      <Row>
+        { cryptos.map((crypto) =>
+        <Col sm={3} className={ 'p-1' } key={ crypto.coinId } style={{ alignSelf: 'stretch' }}>
+        <div className={ 'bg-primary p-4 text-white text-center rounded mb-2' } style={{ height: '100%' }}>
+          <h4>{ crypto.coinName }</h4>
+          <p>{ crypto.kurs }</p>
         </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
+        </Col>
+        )}
+      </Row>
+    </Container>
+  </div>
   )
-}
+  }
+
+  export async function getStaticProps(context){
+
+  let coins = [
+  'bitcoin',
+  'ethereum',
+  'binancecoin',
+  'uniswap',
+  'havven',
+  ]
+  let destination = 'idr'
+
+  let cryptos = await loadPrices(coins, destination)
+  return{
+  props: {
+  cryptos: cryptos
+  },
+  revalidate: 1
+  }
+  }
+
+  async function loadPrices(coins, destination){
+  let cryptos = [];
+
+  let request = await
+  axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${coins.join(",")}&vs_currencies=${destination}`)
+  let responses = request.data
+
+  for(let key of Object.keys(responses)){
+  cryptos.push({
+  coinId: key,
+  coinName: await loadCoin(key),
+  kurs: responses[key]['idr']
+  })
+  }
+
+  return cryptos
+  }
+
+  async function loadCoin(coindId){
+  try{
+  let request = await axios.get(`https://api.coingecko.com/api/v3/coins/${coindId}`)
+  let response = request.data
+
+  if(response){
+  return response.name
+  }else{
+  return coindId
+  }
+  }catch(e){
+  console.log(e)
+  return coindId
+  }
+  }
+
+  export default Index
