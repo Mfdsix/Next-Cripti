@@ -1,12 +1,19 @@
   import {
     Navbar, Nav, Container, Jumbotron, Button, Row, Col
   } from 'react-bootstrap'
+  import Head from 'next/head'
   import 'bootstrap/dist/css/bootstrap.min.css'
   import axios from 'axios'
   
   function Index({ cryptos }){
     return(
       <div>
+        <Head>
+          <title>Home</title>
+          <meta name="title" content="Cripti Home"/>
+          <meta name="description" content="Cripti is a website that show you exchange rate prices of many cryptocurrency coins"/>
+          <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        </Head>
       <Navbar bg="dark" variant="dark">
       <Container>
       <Navbar.Brand href="#home">Cripti</Navbar.Brand>
