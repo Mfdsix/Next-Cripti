@@ -32,7 +32,7 @@
       <Row>
       { cryptos.map((crypto) =>
         <Col sm={3} className={ 'p-1' } key={ crypto.coinId } style={{ alignSelf: 'stretch' }}>
-        <div className={ 'bg-primary p-4 text-white text-center rounded mb-2' } style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className={ crypto.color + ' p-4 text-white text-center rounded mb-2' } style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div>
         <h4>{ crypto.coinName }</h4>
         <p>{ crypto.kurs }</p>
@@ -54,6 +54,14 @@
           'binancecoin',
           'uniswap',
           'havven',
+          'dogecoin',
+          'cardano',
+          'tether',
+          'chainlink',
+          'bitcoin-cash',
+          'ripple',
+          'polkadot',
+          'litecoin'
         ]
         let destination = 'idr'
         
@@ -77,7 +85,8 @@
           cryptos.push({
             coinId: key,
             coinName: await loadCoin(key),
-            kurs: convertToIDR(responses[key]['idr'])
+            kurs: convertToIDR(responses[key]['idr']),
+            color: loadColor()
           })
         }
         
@@ -102,10 +111,24 @@
       
       function convertToIDR(number)
       {
-        var rupiah = '';		
-        var angkarev = number.toString().split('').reverse().join('');
-        for(var i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+'.';
-        return 'IDR '+rupiah.split('',rupiah.length-1).reverse().join('');
+        number = number.toString()
+        if(number.includes(".")){
+          let splitted = number.toString().split(".")
+          var rupiah = '';	
+          var angkarev = splitted[0].toString().split('').reverse().join('');
+          for(var i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+'.';
+          return 'IDR '+ (rupiah.split('',rupiah.length-1).reverse().join('')) + "," + splitted[1];
+        }else{
+          var rupiah = '';	
+          var angkarev = number.toString().split('').reverse().join('');
+          for(var i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+'.';
+          return 'IDR '+ (rupiah.split('',rupiah.length-1).reverse().join(''));
+        }
+      }
+
+      function loadColor(){
+        let colors = ['bg-primary', 'bg-success', 'bg-warning', 'bg-secondary'];
+        return colors[Math.floor(Math.random() * colors.length)]
       }
       
       export default Index
